@@ -35,13 +35,13 @@ app.layout = html.Div(
             }
         ),
 
-        html.H6(
+        html.H4(
             children = [
-                "TUna empresa hotelera gestiona dos hoteles diferentes y ha almacenado información de las reservas realizadas en ambos hoteles durante varios años. Su idea es realizar nuevas campañas publicitarias que puedan atraer a clientes en temporadas bajas y altas entre otras posibles medidas estratégicas."
+                "Una empresa hotelera gestiona dos hoteles diferentes y ha almacenado información de las reservas realizadas en ambos hoteles durante varios años. Su idea es realizar nuevas campañas publicitarias que puedan atraer a clientes en temporadas bajas y altas entre otras posibles medidas estratégicas."
             ],
             id = "txt1",
             style ={
-                "text-align": "left",
+                "text-align": "center",
                 "display": "block"
             }
         ),
@@ -73,10 +73,103 @@ app.layout = html.Div(
                         ),
                         dcc.Dropdown(
                             id='dropdown1',
-                            value=df['hotel'].unique()[0],
+                            value="country",
                             options=[{'value': x, 'label': x}
-                                     for x in df['hotel'].unique()],
+                                     for x in ['country']],
                             clearable=False
+                        ),
+                        dcc.Graph(id="pie_chart1"),
+                        html.H4(
+                            children = [
+                                "The clients are mostly europeans. And this pie chart shows more than a third are portuguese. So we could say that the hotels involved here are located in Portugal."
+                            ],
+                            id = "txt_clients_origins",
+                            style ={
+                                "text-align": "center",
+                                "display": "block"
+                            }
+
+                        )
+                    ],
+                    style = {
+                        "width": "700px",
+                        "height": "600px",
+                        "display": "inline-block",
+                        "border-style": "ridge",
+                        "border-color": "black"
+                    },
+                ),
+
+                html.Div( #
+                    children = [
+                        html.H3(
+                            children = [
+                                "Clients per reservations"
+                            ],
+                            id = "arrival_date_month",
+                            style = {
+                                "display": "block",
+                                "text-align": "center"
+                            }
+                        ),
+                        dcc.Dropdown(
+                            id='dropdown2',
+                            value="adults",
+                            options=[{'value': x, 'label': x}
+                                     for x in ['adults']],
+                            clearable=False
+                        ),
+                        dcc.Graph(id="pie_chart2"),
+                        html.H4(
+                            children = [
+                                "The clients are mostly europeans. And this pie chart shows more than a third are portuguese. So we could say that the hotels involved here are located in Portugal."
+                            ],
+                            id = "txt_clients_per_reservation",
+                            style ={
+                                "text-align": "center",
+                                "display": "block"
+                            }
+
+                        )
+                    ],
+                    style = {
+                        "width": "700px",
+                        "height": "600px",
+                        "display": "inline-block",
+                        "border-style": "ridge",
+                        "border-color": "black"
+                    },
+                ),
+            ],
+        ),
+        html.Div(
+            children = [
+                html.Div(
+                    children = [
+                        html.H3(
+                            children = [
+                                "Clients per Reservation"
+                            ],
+                            id = "clients_per_reservation",
+                            style = {
+                                "display": "block",
+                                "text-align": "center"
+                            }
+                        ),
+                        dcc.Dropdown(
+                            id='dropdown3',
+                            value="country",
+                            options=[{'value': x, 'label': x}
+                                     for x in ['hotel']],
+                            clearable=False
+                        ),
+                        dcc.Graph(id="pie_chart3"),
+                        html.H4(
+                            children = [
+                                "x1"
+                            ],
+                            id = "x1"
+
                         )
                     ],
                 ),
@@ -85,18 +178,36 @@ app.layout = html.Div(
                     children = [
                         html.H3(
                             children = [
-                                "Arrival Date (Month)"
+                                "Price"
                             ],
-                            id = "arrival_date_month",
+                            id = "price_revevenues",
                             style = {
                                 "display": "block",
                                 "text-align": "center"
                             }
                         ),
-                        dcc.Graph(id="plot_arrival_date_month")
-                    ]
-                )
-            ]
+                        dcc.Dropdown(
+                            id='dropdown4',
+                            value="adr",
+                            options=[{'value': x, 'label': x}
+                                     for x in ['adr']],
+                            clearable=False
+                        ),
+                        dcc.Graph(id="pie_chart4"),
+                        html.H4(
+                            children = [
+                                "x2"
+                            ],
+                            id = "x2",
+                            style ={
+                                "text-align": "center",
+                                "display": "block"
+                            }
+
+                        )
+                    ],
+                ),
+            ],
         ),
     ],
     style = {
@@ -105,18 +216,27 @@ app.layout = html.Div(
 )
 
 @app.callback(
-    Output("pie_chart", "figure"),
-    Input("dropdown1", "value"))
 
-def pie_chart(dropdown1):
+    [Output("pie_chart1", "figure"),
+     Output("pie_chart2", "figure"),
+     Output("pie_chart3", "figure"),
+     Output("pie_chart4", "figure")],
 
-    fig = go.Figure()
-    fig.add_trace(
-        go.Pie(
-            labels = df[df["country"]==dropdown1].unique(), values = df[df["country"]==dropdown1].value_counts(normalize=True)
-        )
-    )
-    return fig
+    [Input("dropdown1", "value"),
+     Input("dropdown2", "value"),
+     Input("dropdown1", "value"),
+     Input("dropdown2", "value")]
+)
+
+def pie_chart(dropdown1,dropdown2,dropdown3,dropdown4):
+    dff=df
+    df_per = df.groupby(['hotel', ])["adults", "children", "babies"].count()
+    fig1 = px.pie(data_frame=dff, names=dropdown1, hole=.3,)
+    fig2 = px.pie(data_frame=dff, names=dropdown2, hole=.3,)
+    fig3 = px.pie(data_frame=dff, names=dropdown3, hole=.3,)
+    fig4 = px.pie(data_frame=dff, names=dropdown4, hole=.3,)
+
+    return fig1, fig2, fig3, fig4
 
 
 app.run_server()
