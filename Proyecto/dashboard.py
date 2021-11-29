@@ -158,7 +158,7 @@ app.layout = html.Div(
                         ),
                         dcc.Dropdown(
                             id='dropdown3',
-                            value="country",
+                            value="hotel",
                             options=[{'value': x, 'label': x}
                                      for x in ['hotel']],
                             clearable=False
@@ -168,7 +168,11 @@ app.layout = html.Div(
                             children = [
                                 "x1"
                             ],
-                            id = "x1"
+                            id = "x1",
+                            style ={
+                                "text-align": "center",
+                                "display": "block"
+                            }
 
                         )
                     ],
@@ -233,7 +237,7 @@ def pie_chart(dropdown1,dropdown2,dropdown3,dropdown4):
     df_per = df.groupby(['hotel', ])["adults", "children", "babies"].count()
     fig1 = px.pie(data_frame=dff, names=dropdown1, hole=.3,)
     fig2 = px.pie(data_frame=dff, names=dropdown2, hole=.3,)
-    fig3 = px.pie(data_frame=dff, names=dropdown3, hole=.3,)
+    fig3 = px.pie(data_frame=df_per, names=dropdown3, hole=.3,)
     fig4 = px.pie(data_frame=dff, names=dropdown4, hole=.3,)
 
     return fig1, fig2, fig3, fig4
