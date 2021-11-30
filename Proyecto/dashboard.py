@@ -79,6 +79,7 @@ app.layout = html.Div(
                             clearable=False
                         ),
                         dcc.Graph(id="pie_chart1"),
+                        html.Br(),
                         html.H4(
                             children = [
                                 "The clients are mostly europeans. And this pie chart shows more than a third are portuguese. So we could say that the hotels involved here are located in Portugal."
@@ -89,14 +90,13 @@ app.layout = html.Div(
                                 "display": "block"
                             }
 
-                        )
+                        ),
+                        html.Br(),
                     ],
                     style = {
                         "width": "700px",
                         "height": "600px",
                         "display": "inline-block",
-                        "border-style": "ridge",
-                        "border-color": "black"
                     },
                 ),
 
@@ -120,6 +120,7 @@ app.layout = html.Div(
                             clearable=False
                         ),
                         dcc.Graph(id="pie_chart2"),
+                        html.Br(),
                         html.H4(
                             children = [
                                 "The clients are mostly europeans. And this pie chart shows more than a third are portuguese. So we could say that the hotels involved here are located in Portugal."
@@ -130,14 +131,13 @@ app.layout = html.Div(
                                 "display": "block"
                             }
 
-                        )
+                        ),
+                        html.Br(),
                     ],
                     style = {
                         "width": "700px",
                         "height": "600px",
                         "display": "inline-block",
-                        "border-style": "ridge",
-                        "border-color": "black"
                     },
                 ),
             ],
@@ -222,25 +222,38 @@ app.layout = html.Div(
 @app.callback(
 
     [Output("pie_chart1", "figure"),
-     Output("pie_chart2", "figure"),
-     Output("pie_chart3", "figure"),
-     Output("pie_chart4", "figure")],
+     Output("pie_chart2", "figure")
+     ],
 
     [Input("dropdown1", "value"),
-     Input("dropdown2", "value"),
-     Input("dropdown1", "value"),
-     Input("dropdown2", "value")]
+     Input("dropdown2", "value")
+    ]
 )
 
-def pie_chart(dropdown1,dropdown2,dropdown3,dropdown4):
+def pie_chart(dropdown1,dropdown2):
     dff=df
-    df_per = df.groupby(['hotel', ])["adults", "children", "babies"].count()
+
     fig1 = px.pie(data_frame=dff, names=dropdown1, hole=.3,)
     fig2 = px.pie(data_frame=dff, names=dropdown2, hole=.3,)
-    fig3 = px.pie(data_frame=df_per, names=dropdown3, hole=.3,)
+
+    return fig1, fig2
+
+@app.callback(
+
+    [Output("pie_chart3", "figure"),
+     Output("pie_chart4", "figure")],
+
+    [Input("dropdown3", "value"),
+     Input("dropdown4", "value")]
+)
+def pie_chart2(dropdown3,dropdown4):
+    dff=df
+    #df_per = df.groupby(['hotel', ])["adults", "children", "babies"].count()
+
+    fig3 = px.pie(data_frame=dff, names=dropdown3, hole=.3,)
     fig4 = px.pie(data_frame=dff, names=dropdown4, hole=.3,)
 
-    return fig1, fig2, fig3, fig4
+    return fig3, fig4
 
 
 app.run_server()
