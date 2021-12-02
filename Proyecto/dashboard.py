@@ -7,7 +7,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 from trab import ts_resort_fin, ts_city_fin
-from trab2 import test_r, test_c, pred_r, pred_c, pred_forc_r, pred_forc_c
+#from trab2 import test_r, test_c, pred_r, pred_c, pred_forc_r, pred_forc_c
 
 
 data = pd.read_csv("./trabajo4.csv")
@@ -383,7 +383,7 @@ def generate_ts_chart(dropdown5):
     fig5 = go.Figure(data = data, layout = layout)
     return fig5
 
-
+"""
 @app.callback(
     Output("graph_pred", "figure"),
     Input("dropdown6", "value"))
@@ -463,5 +463,5 @@ def generate_forcast_chart(dropdown7):
     fig7 = go.Figure(data = data, layout = layout)
 
     return fig7
-
+"""
 app.run_server()
