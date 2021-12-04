@@ -13,3 +13,21 @@ Para ello la empresa os pide:
 ## Información de las variables.
 
 * https://www.sciencedirect.com/science/article/pii/S2352340918315191
+
+
+
+# Job 4 : Prévision des revenus des hôtels
+
+Une société hôtelière gère deux hôtels différents et a stocké des informations sur les réservations effectuées dans les deux hôtels pendant plusieurs années. L'idée est de réaliser de nouvelles campagnes publicitaires qui puissent attirer les clients en basse et haute saison, parmi d'autres mesures stratégiques possibles.
+
+Pour ce faire, l'entreprise vous demande de :
+
+* Effectuer une analyse exploratoire des données en détaillant les aspects les plus pertinents que vous avez trouvés.
+* Construire un modèle de prévision qui prédit les revenus qui seront perçus par chaque hôtel.
+* Développez un tableau de bord avec Dash qui résume les aspects les plus pertinents que vous avez extraits dans l'analyse exploratoire et montre quelles sont les prévisions de revenus des hôtels.
+
+Quelles mesures stratégiques fondées sur les données recommanderiez-vous pour attirer de nouveaux clients ? 
+
+## Information sur la variable.
+
+* https://www.sciencedirect.com/science/article/pii/S2352340918315191
