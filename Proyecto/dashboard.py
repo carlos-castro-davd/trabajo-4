@@ -6,12 +6,34 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-from trab import ts_resort_fin, ts_city_fin
-#from trab2 import test_r, test_c, pred_r, pred_c, pred_forc_r, pred_forc_c
+import pandas as pd
+import numpy as np
+import plotly.graph_objects as go
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 
 data = pd.read_csv("./trabajo4.csv")
 df=data
+
+ts_resort_fin = pd.read_csv("data_from_notebook/ts_resort_fin.csv",header = None, index_col = 0, squeeze = True)
+test_r = pd.read_csv("data_from_notebook/test_r.csv",header = None, index_col = 0, squeeze = True)
+pred_r = pd.read_csv("data_from_notebook/pred_r.csv",header = None, index_col = 0, squeeze = True)
+pred_forc_r = pd.read_csv("data_from_notebook/pred_forc_r.csv",header = None, index_col = 0, squeeze = True)
+
+ts_city_fin = pd.read_csv("data_from_notebook/ts_city_fin.csv",header = None, index_col = 0, squeeze = True)
+test_c = pd.read_csv("data_from_notebook/test_c.csv",header = None, index_col = 0, squeeze = True)
+pred_c = pd.read_csv("data_from_notebook/pred_c.csv",header = None, index_col = 0, squeeze = True)
+pred_forc_c = pd.read_csv("data_from_notebook/pred_forc_c.csv",header = None, index_col = 0, squeeze = True)
+
+
+def mean_absolute_percentage_error(y_true, y_pred):
+    return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+rmse_r = np.sqrt(mean_squared_error(test_r, pred_r))
+mae_r = mean_absolute_error(test_r,pred_r)
+mape_r = mean_absolute_percentage_error(test_r,pred_r)
+rmse_c = np.sqrt(mean_squared_error(test_c, pred_c))
+mae_c = mean_absolute_error(test_c,pred_c)
+mape_c = mean_absolute_percentage_error(test_c,pred_c)
 
 df['arrival_date_month'].loc[(df['arrival_date_month'] == "January")] = 1
 df['arrival_date_month'].loc[(df['arrival_date_month'] == "February")] = 2
@@ -51,8 +73,8 @@ app.layout = html.Div(
 
         html.H4(
             children = [
-                "Una empresa hotelera gestiona dos hoteles diferentes y ha almacenado información de las reservas realizadas en ambos hoteles durante varios años. Su idea es realizar nuevas campañas publicitarias que puedan atraer a clientes en temporadas bajas y altas entre otras posibles medidas estratégicas."
-            ],
+                "Desarrollo un cuadro de mando con Dash que resuma los aspectos más relevantes que hayáis extraido en el análisis exploratorio y muestre cual es la previsión de ingresos de los hoteles."
+                ],
             id = "txt1",
             style ={
                 "text-align": "center",
@@ -107,6 +129,7 @@ app.layout = html.Div(
 
                         ),
                         html.Br(),
+                        html.Br(),
                     ],
                     style = {
                         "width": "700px",
@@ -119,7 +142,7 @@ app.layout = html.Div(
                     children = [
                         html.H3(
                             children = [
-                                "Clients per reservations"
+                                "Number of clients/reservation"
                             ],
                             id = "arrival_date_month",
                             style = {
@@ -130,15 +153,14 @@ app.layout = html.Div(
                         dcc.Dropdown(
                             id='dropdown2',
                             value="adults",
-                            options=[{'value': x, 'label': x}
-                                     for x in ['adults']],
+                            options=[{'value': 'Clients', 'label': 'adults'}],
                             clearable=False
                         ),
                         dcc.Graph(id="pie_chart2"),
                         html.Br(),
                         html.H4(
                             children = [
-                                "The clients are mostly europeans. And this pie chart shows more than a third are portuguese. So we could say that the hotels involved here are located in Portugal."
+                                "The hotels could mostly expect 2 clients per reservation "
                             ],
                             id = "txt_clients_per_reservation",
                             style ={
@@ -147,6 +169,8 @@ app.layout = html.Div(
                             }
 
                         ),
+                        html.Br(),
+                        html.Br(),
                         html.Br(),
                     ],
                     style = {
@@ -180,7 +204,7 @@ app.layout = html.Div(
                         dcc.Graph(id="line_chart"),
                         html.H4(
                             children = [
-                                "x1ffkldfnlnl dfnf fdnldn fgldfgnld fdngldn dfnlnd ngdlnfg"
+                                "For City Hotel, the income per room almost constant during the year with a slight decrease between november and march. For Resort we have a high income per room from June to August and during the others months it's very less."
                             ],
                             id = "line_chart_conclu",
                             style ={
@@ -188,7 +212,10 @@ app.layout = html.Div(
                                 "display": "block"
                             }
 
-                        )
+                        ),
+                        html.Br(),
+                        html.Br(),
+                        html.Br(),
                     ],
                 ),
 
@@ -196,7 +223,7 @@ app.layout = html.Div(
                     children = [
                         html.H3(
                             children = [
-                                "Cancellation impact on ohters variables"
+                                "Cancelation vs Other features"
                             ],
                             id = "txt_sub_bars",
                             style = {
@@ -239,9 +266,9 @@ app.layout = html.Div(
                     children = [
                         html.H3(
                             children = [
-                                "Hotel revenues as time serie"
+                                "Forcasting"
                             ],
-                            id = "txt_time_serie",
+                            id = "txt_forc",
                             style = {
                                 "display": "block",
                                 "text-align": "center"
@@ -253,49 +280,14 @@ app.layout = html.Div(
                             options=[{'label': x, 'value': x} for x in ["Resort Hotel","City Hotel"]],
                             clearable=False
                         ),
-                        dcc.Graph(id="graph_time_serie"),
-                    ],
-                ),
-                html.Div( #
-                    children = [
-                        html.H3(
-                            children = [
-                                "Prediction"
-                            ],
-                            id = "txt_pred",
+                        dcc.Graph(id="graph_forc"),
+                        html.H4(
+                            id="metrics",
                             style = {
                                 "display": "block",
                                 "text-align": "center"
                             }
                         ),
-                        dcc.Dropdown(
-                            id='dropdown6',
-                            value="Resort Hotel",
-                            options=[{'label': x, 'value': x} for x in ["Resort Hotel","City Hotel"]],
-                            clearable=False
-                        ),
-                        dcc.Graph(id="graph_pred"),
-                    ],
-                ),
-                html.Div( #
-                    children = [
-                        html.H3(
-                            children = [
-                                "Forcasting"
-                            ],
-                            id = "txt_forcast",
-                            style = {
-                                "display": "block",
-                                "text-align": "center"
-                            }
-                        ),
-                        dcc.Dropdown(
-                            id='dropdown7',
-                            value="Resort Hotel",
-                            options=[{'label': x, 'value': x} for x in ["Resort Hotel","City Hotel"]],
-                            clearable=False
-                        ),
-                        dcc.Graph(id="graph_forcast")
                     ],
                 ),
     ],
@@ -357,38 +349,11 @@ def generate_bar_chart(dropdown4):
 
 
 @app.callback(
-    Output("graph_time_serie", "figure"),
-    Input("dropdown5", "value"))
-
-def generate_ts_chart(dropdown5):
-    data = [
-        go.Scatter(
-            x = ts_resort_fin.index,
-            y = ts_resort_fin,
-            mode = "lines",
-            line = dict(color = "steelblue"),
-            name = "Total revenue")]
-    layout = go.Layout(title = "Total revenue for the Resort Hotel", xaxis_title = "Timestamp", yaxis_title = "Total revenue")
-
-    if dropdown5 == "City Hotel":
-        data = [
-            go.Scatter(
-                x = ts_city_fin.index,
-                y = ts_city_fin,
-                mode = "lines",
-                line = dict(color = "steelblue"),
-                name = "Total revenue")]
-        layout = go.Layout(title = "Total revenue for the City Hotel", xaxis_title = "Timestamp", yaxis_title = "Total revenue")
-
-    fig5 = go.Figure(data = data, layout = layout)
-    return fig5
-
-"""
-@app.callback(
-    Output("graph_pred", "figure"),
-    Input("dropdown6", "value"))
-
-def generate_pred_chart(dropdown6):
+    [Output("graph_forc", "figure"),
+     Output("metrics", "children")],
+    [Input("dropdown5", "value")]
+)
+def generate_pred_chart(dropdown5):
     data = [
         go.Scatter(
             x = ts_resort_fin.index,
@@ -401,10 +366,17 @@ def generate_pred_chart(dropdown6):
             y = pred_r,
             mode = "lines",
             line = dict(color = "firebrick", dash = "dash"),
-            name = "Forecast")]
+            name = "Forecast 1"),
+        go.Scatter(
+            x = pred_forc_r.index,
+            y = pred_forc_r,
+            mode = "lines",
+            line = dict(color = "darkgreen", dash = "dash"),
+            name = "Forecast 2")]
     layout = go.Layout(title = "Total revenue for the Resort Hotel", xaxis_title = "Timestamp", yaxis_title = "Total revenue")
+    metrics = "RMSE (Root Mean Square Error) : "+str(rmse_r)+"\n"+"MAE (Mean Absolute Error) : "+str(mae_r)+"\n"+"MAPE (Mean Percentage Error) : "+str(mape_r)
 
-    if dropdown6 == "City Hotel":
+    if dropdown5 == "City Hotel":
         data = [
             go.Scatter(
                 x = ts_city_fin.index,
@@ -417,51 +389,19 @@ def generate_pred_chart(dropdown6):
                 y = pred_c,
                 mode = "lines",
                 line = dict(color = "firebrick", dash = "dash"),
-                name = "Forecast")]
-        layout = go.Layout(title = "Total revenue for the City Hotel", xaxis_title = "Timestamp", yaxis_title = "Total revenue")
-
-    fig6 = go.Figure(data = data, layout = layout)
-
-    return fig6
-
-@app.callback(
-    Output("graph_forcast", "figure"),
-    Input("dropdown7", "value"))
-
-def generate_forcast_chart(dropdown7):
-    data = [
-        go.Scatter(
-            x = ts_resort_fin.index,
-            y = ts_resort_fin,
-            mode = "lines",
-            line = dict(color = "steelblue"),
-            name = "Total revenue"),
-        go.Scatter(
-            x = pred_forc_r.index,
-            y = pred_forc_r,
-            mode = "lines",
-            line = dict(color = "firebrick", dash = "dash"),
-            name = "Forecast")]
-    layout = go.Layout(title = "Total revenue forecasted for the Resort Hotel", xaxis_title = "Timestamp", yaxis_title = "Total revenue")
-
-    if dropdown7 == "City Hotel":
-        data = [
-            go.Scatter(
-                x = ts_city_fin.index,
-                y = ts_city_fin,
-                mode = "lines",
-                line = dict(color = "steelblue"),
-                name = "Total revenue"),
+                name = "Forecast 1"),
             go.Scatter(
                 x = pred_forc_c.index,
                 y = pred_forc_c,
                 mode = "lines",
-                line = dict(color = "firebrick", dash = "dash"),
-                name = "Forecast")]
-        layout = go.Layout(title = "Total revenue forecasted for the City Hotel", xaxis_title = "Timestamp", yaxis_title = "Total revenue")
+                line = dict(color = "darkgreen", dash = "dash"),
+                name = "Forecast 2")]
+        layout = go.Layout(title = "Total revenue for the City Hotel", xaxis_title = "Timestamp", yaxis_title = "Total revenue")
+        metrics = "RMSE(Root Mean Square Error):"+str(rmse_c)+" MAE(Mean Absolute Error):"+str(mae_c)+" MAPE (Mean Percentage Error):"+str(mape_c)
 
-    fig7 = go.Figure(data = data, layout = layout)
+    fig5 = go.Figure(data = data, layout = layout)
 
-    return fig7
-"""
+    return fig5,metrics
+
+
 app.run_server()
